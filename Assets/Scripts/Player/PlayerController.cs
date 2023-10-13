@@ -7,41 +7,47 @@ namespace Player
 {
     public class PlayerController : MonoBehaviour
     {
-        [SerializeField] private float moveSpeed = 5.0f;
+        [SerializeField] private float moveSpeed = 5f;
         [SerializeField] private float gravity = -9.81f;
-        
-        // Velocity vector to store vertical movement due to gravity
-        private Vector3 velocity; 
+        [SerializeField] private float rotationSpeed = 5f;
+        private Vector3 velocity;
         private CharacterController characterController;
         private InputManager inputManager;
 
         private void Awake()
         {
-            inputManager = GetComponent<InputManager>();
             characterController = GetComponent<CharacterController>();
+            inputManager = GetComponent<InputManager>();
         }
 
         private void Update()
         {
-            //Get the movement input from the InputManager script
-            var moveDirection = new Vector3(inputManager.MoveInput.x, 0, inputManager.MoveInput.y).normalized;
+            var moveDirection = inputManager.MoveInput;
+            var move = new Vector3(moveDirection.x, 0, moveDirection.y).normalized;
             
-            // Apply gravity (if the character is not grounded)
-            if (!characterController.isGrounded)
+            // Rotate the character to face the move direction
+            if (move != Vector3.zero) // Check to avoid setting rotation when there's no input
+            {
+                var targetAngle = Mathf.Atan2(move.x, move.z) * Mathf.Rad2Deg;
+                var targetRotation = Quaternion.Euler(0, targetAngle, 0);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            }
+
+            // Apply gravity
+            if (characterController.isGrounded && velocity.y < 0)
+            {
+                velocity.y = -2f; // Small downward force to keep the player grounded
+            }
+            else
             {
                 velocity.y += gravity * Time.deltaTime;
             }
-            else if (characterController.isGrounded && velocity.y < 0)
-            {
-                // Small downward force to keep the player grounded
-                velocity.y = -2f; 
-            }
-            
+
             // Combine horizontal movement with vertical movement due to gravity
-            var move = moveDirection * moveSpeed + velocity;
+            var combinedMove = move * moveSpeed + velocity;
 
             // Use CharacterController.Move() to move the character
-            characterController.Move(move * Time.deltaTime);
+            characterController.Move(combinedMove * Time.deltaTime);
         }
     }
 }
