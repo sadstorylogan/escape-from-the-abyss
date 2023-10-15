@@ -13,17 +13,26 @@ namespace Player
         private Vector3 velocity;
         private CharacterController characterController;
         private InputManager inputManager;
+        private Animator animator;
 
         private void Awake()
         {
             characterController = GetComponent<CharacterController>();
             inputManager = GetComponent<InputManager>();
+            animator = GetComponent<Animator>();
         }
 
         private void Update()
         {
+            // Fetch the movement input from the InputManager
             var moveDirection = inputManager.MoveInput;
+            
+            // Convert the 2D input into a 3D vector for movement
             var move = new Vector3(moveDirection.x, 0, moveDirection.y).normalized;
+
+            // Update the Animator Parameter
+            var moveMagnitude = moveDirection.magnitude;
+            animator.SetFloat("Speed", moveMagnitude);
             
             // Rotate the character to face the move direction
             if (move != Vector3.zero) // Check to avoid setting rotation when there's no input
