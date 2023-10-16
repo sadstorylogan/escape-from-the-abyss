@@ -2252,7 +2252,7 @@ MonoBehaviour:
   gravity: -9.81
   rotationSpeed: 5
   dashSpeed: 50
-  dashDuration: 0.1
+  dashDuration: 1
   dashCooldown: 2
   lastDashTime: -10
 --- !u!143 &1071449350
