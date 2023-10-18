@@ -8,24 +8,29 @@ namespace Player
 {
     public class PlayerController : MonoBehaviour
     {
+        // Movement variables
         [SerializeField] private float moveSpeed = 5f;
         [SerializeField] private float gravity = -9.81f;
         [SerializeField] private float rotationSpeed = 5f;
+        private Vector3 velocity;
         
         // Dash mechanics variables
         [SerializeField] private float dashSpeed = 10f;
         [SerializeField] private float dashDuration = 1f;
         [SerializeField] private float dashCooldown = 2f;
         [SerializeField] private float lastDashTime = -10f;
+        private bool isDashing;
         
-        private Vector3 velocity;
+        // Attack variables
+        private int comboStage = 0;
+        private float lastAttackTime;
+        private float comboResetTime = 1f;
+        private bool isAttacking = false;
+        
         private CharacterController characterController;
         private InputManager inputManager;
         private Animator animator;
         
-        private bool isDashing;
-
-
         private void Awake()
         {
             characterController = GetComponent<CharacterController>();
@@ -35,11 +40,44 @@ namespace Player
 
         private void Start()
         {
-            //inputManager.OnAttack += 
+            inputManager.OnAttack += Attack;
+        }
+
+        private void Attack()
+        {
+            // If not already attacking, start a new attack sequence.
+            if (!isAttacking)
+            {
+                isAttacking = true;
+                comboStage = 1; // Start at the first stage of the combo.
+                animator.SetTrigger("Attack");
+                animator.SetInteger("Combo", comboStage);
+                lastAttackTime = Time.time; // Record the time of this initial attack.
+            }
+            else if (Time.time - lastAttackTime <= comboResetTime) // We are within the combo continuation window.
+            {
+                // If we're not at the last stage of the combo, advance to the next stage.
+                if (comboStage < 3)
+                {
+                    comboStage++;
+                    animator.SetInteger("Combo", comboStage);
+                    lastAttackTime = Time.time; // Update the time of the last attack.
+                }
+            }
+            
+            Debug.Log("Attack button pressed. Combo stage: " + comboStage);
         }
 
         private void Update()
         {
+            // If we're in an attack and too much time has passed since the last attack in the combo, reset.
+            if (isAttacking && Time.time - lastAttackTime > comboResetTime)
+            {
+                isAttacking = false;
+                comboStage = 0;
+                animator.SetInteger("Combo", comboStage); // Reset the combo in the animator.
+            }
+            
             if (!isDashing)
             {
                 HandleMovement();
@@ -50,6 +88,11 @@ namespace Player
             {
                 StartCoroutine(PerformDash());
             }
+        }
+
+        private void OnDestroy()
+        {
+            inputManager.OnAttack -= Attack;
         }
 
         private IEnumerator PerformDash()

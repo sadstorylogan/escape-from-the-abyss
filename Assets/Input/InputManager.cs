@@ -36,6 +36,7 @@ namespace Input
             playerControls.Gameplay.Disable();
         }
         
+
         public void DisableMovementInput()
         {
             playerControls.Gameplay.Move.Disable();
