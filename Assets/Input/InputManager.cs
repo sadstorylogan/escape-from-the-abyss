@@ -9,6 +9,9 @@ namespace Input
         public Vector2 MoveInput { get; private set; }
         public bool DashRequested { get;  set; }
 
+        public delegate void AttackAction(); 
+        public event AttackAction OnAttack;
+
         private void Awake()
         {
             playerControls = new PlayerControls();
@@ -19,6 +22,8 @@ namespace Input
 
             playerControls.Gameplay.Dash.performed += ctx => DashRequested = true;
             playerControls.Gameplay.Dash.canceled += ctx => DashRequested = false;
+
+            playerControls.Gameplay.Attack.performed += ctx => AttackPerformed();
         }
 
         private void OnEnable()
@@ -39,6 +44,11 @@ namespace Input
         public void EnableMovementInput()
         {
             playerControls.Gameplay.Move.Enable();
+        }
+
+        private void AttackPerformed()
+        {
+            OnAttack?.Invoke();
         }
     }
 }

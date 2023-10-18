@@ -33,6 +33,11 @@ namespace Player
             animator = GetComponent<Animator>();
         }
 
+        private void Start()
+        {
+            //inputManager.OnAttack += 
+        }
+
         private void Update()
         {
             if (!isDashing)
