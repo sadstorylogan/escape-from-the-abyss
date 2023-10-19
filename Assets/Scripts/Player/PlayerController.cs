@@ -45,39 +45,30 @@ namespace Player
 
         private void Attack()
         {
-            // If not already attacking, start a new attack sequence.
-            if (!isAttacking)
+            // If we're not attacking or if too much time has passed (outside combo window), start a new combo.
+            if (!isAttacking || Time.time - lastAttackTime > comboResetTime)
             {
                 isAttacking = true;
-                comboStage = 1; // Start at the first stage of the combo.
+                comboStage = 1; // Start the combo from the beginning.
                 animator.SetTrigger("Attack");
                 animator.SetInteger("Combo", comboStage);
-                lastAttackTime = Time.time; // Record the time of this initial attack.
+                lastAttackTime = Time.time; // Record the time of this attack.
             }
-            else if (Time.time - lastAttackTime <= comboResetTime) // We are within the combo continuation window.
+            else if (comboStage < 3) // If already in a combo sequence and not at the last stage.
             {
-                // If we're not at the last stage of the combo, advance to the next stage.
-                if (comboStage < 3)
-                {
-                    comboStage++;
-                    animator.SetInteger("Combo", comboStage);
-                    lastAttackTime = Time.time; // Update the time of the last attack.
-                }
+                comboStage++;
+                animator.SetInteger("Combo", comboStage);
+                lastAttackTime = Time.time; // Update the time of the most recent attack in the combo.
+                ResetCombo();
             }
-            
-            Debug.Log("Attack button pressed. Combo stage: " + comboStage);
+
+            Debug.Log("Attack method called. Combo stage is now: " + comboStage);
         }
 
         private void Update()
         {
-            // If we're in an attack and too much time has passed since the last attack in the combo, reset.
-            if (isAttacking && Time.time - lastAttackTime > comboResetTime)
-            {
-                isAttacking = false;
-                comboStage = 0;
-                animator.SetInteger("Combo", comboStage); // Reset the combo in the animator.
-            }
-            
+            ResetCombo();
+
             if (!isDashing)
             {
                 HandleMovement();
@@ -87,6 +78,17 @@ namespace Player
             if (inputManager.DashRequested && Time.time >= lastDashTime + dashCooldown)
             {
                 StartCoroutine(PerformDash());
+            }
+        }
+
+        private void ResetCombo()
+        {
+            // If we're in an attack and too much time has passed since the last attack in the combo, reset.
+            if (isAttacking && Time.time - lastAttackTime > comboResetTime)
+            {
+                isAttacking = false;
+                comboStage = 0;
+                animator.SetInteger("Combo", comboStage); // Reset the combo in the animator.
             }
         }
 
