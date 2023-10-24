@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
+using Enemy;
 using Input;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Object = UnityEngine.Object;
 
 namespace Player
 {
@@ -26,6 +28,12 @@ namespace Player
         private float lastAttackTime;
         private float comboResetTime = 1f;
         private bool isAttacking = false;
+        [SerializeField] private float attackDamage = 20f;
+        [SerializeField] private EnemyAI enemy;
+        [SerializeField] private float attackRange = 10f;
+
+        [SerializeField] private float maxHealth = 100f;
+        private float currentHealth;
         
         private CharacterController characterController;
         private InputManager inputManager;
@@ -36,6 +44,8 @@ namespace Player
             characterController = GetComponent<CharacterController>();
             inputManager = GetComponent<InputManager>();
             animator = GetComponent<Animator>();
+
+            currentHealth = maxHealth;
         }
 
         private void Start()
@@ -155,6 +165,32 @@ namespace Player
 
             // Use CharacterController.Move() to move the character
             characterController.Move(combinedMove * Time.deltaTime);
+        }
+
+        public void TakeDamage(float damageAmount)
+        {
+            currentHealth -= damageAmount;
+            Debug.Log("Player took damage. Current health: " + currentHealth);
+
+            if (currentHealth <= 0)
+            {
+                Die();
+            }
+        }
+        
+        public void DealDamageToEnemy()
+        {
+            // Check for the enemy's proximity might be a good idea, so you don't damage enemies that are too far away.
+            var distanceToEnemy = Vector3.Distance(transform.position, enemy.transform.position);
+            if(distanceToEnemy <= attackRange) // Ensure you define an appropriate attackRange
+            {
+                enemy.TakeDamage(attackDamage);
+            }
+        }
+
+        private void Die()
+        {
+            Destroy(gameObject);
         }
     }
 }
