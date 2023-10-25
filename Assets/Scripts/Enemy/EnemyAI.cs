@@ -10,7 +10,9 @@ namespace Enemy
         {
             Idle,
             Chase,
-            Attack
+            Attack,
+            Hit,
+            Dead
         }
 
         private State currentState = State.Idle;
@@ -76,6 +78,10 @@ namespace Enemy
                         currentState = State.Chase;
                     }
                     break;
+                
+                case State.Hit:
+                    // Logic for hit state can be handled here if needed
+                    break;
             }
             HandleAnimations();
         }
@@ -88,16 +94,39 @@ namespace Enemy
         
         public void TakeDamage(float damageAmount)
         {
+            if (currentState == State.Dead) return;
+            
             currentHealth -= damageAmount;
             Debug.Log("Enemy took damage. Current health: " + currentHealth);
-
+            
             if (currentHealth <= 0)
             {
+                currentState = State.Dead;
                 Die();
+            }
+            else
+            {
+                currentState = State.Hit; 
+                animator.SetTrigger("GetHit");
             }
         }
 
         private void Die()
+        {
+            animator.SetTrigger("Die");
+            DisableEnemy();
+        }
+
+        private void DisableEnemy()
+        {
+            // Disable components
+            GetComponent<Collider>().enabled = false;
+            navMeshAgent.enabled = false;
+            // ... other components if needed
+        }
+        
+        // This method will be called by an animation event at the end of the death animation
+        public void OnDeathAnimationComplete()
         {
             Destroy(gameObject);
         }
