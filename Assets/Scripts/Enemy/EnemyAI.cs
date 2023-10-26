@@ -16,18 +16,21 @@ namespace Enemy
         }
 
         private State currentState = State.Idle;
-
+        
+        [Header("References")]
         [SerializeField] private Transform player;
-        [SerializeField] private float detectionRange = 5f;
-        [SerializeField] private float attackRange = 1f;
-
         private Animator animator;
         private NavMeshAgent navMeshAgent;
+        private DamageFeedback damageFeedback; 
     
+        [Header("AI Properties")]
+        [SerializeField] private float detectionRange = 5f;
+        [SerializeField] private float attackRange = 1f;
         [SerializeField] private float attackDamage = 10f;
         [SerializeField] private float attackDelay = 1f; // Time delay between successive attacks
         private float lastAttackTime;
         
+        [Header("Health Properties")]
         [SerializeField] private float maxHealth = 100f;
         private float currentHealth;
 
@@ -35,6 +38,13 @@ namespace Enemy
         {
             animator = GetComponent<Animator>();
             navMeshAgent = GetComponent<NavMeshAgent>();
+            damageFeedback = GetComponentInChildren<DamageFeedback>();
+
+            if (damageFeedback == null)
+            {
+                Debug.LogError("No DamageFeedback script found on the children object" + gameObject.name);
+            }
+            
             currentHealth = maxHealth;
         }
     
@@ -99,6 +109,13 @@ namespace Enemy
             currentHealth -= damageAmount;
             Debug.Log("Enemy took damage. Current health: " + currentHealth);
             
+            animator.SetTrigger("GetHit");
+            
+            if (damageFeedback != null)
+            {
+                damageFeedback.TriggerDamageFlash();
+            }
+            
             if (currentHealth <= 0)
             {
                 currentState = State.Dead;
@@ -129,6 +146,27 @@ namespace Enemy
         public void OnDeathAnimationComplete()
         {
             Destroy(gameObject);
+        }
+        
+        public void OnHitAnimationComplete()
+        {
+            /* Check what the character should be doing after recovering from the hit. For instance, if the player is within
+            attack range, the enemy should transition to the Attack state. Otherwise, it might return to Idle or Chase. */
+
+            var distanceToPlayer = Vector3.Distance(transform.position, player.position);
+            if (distanceToPlayer <= attackRange)
+            {
+                currentState = State.Attack; 
+            }
+            else if (distanceToPlayer <= detectionRange)
+            {
+                currentState = State.Chase; 
+            }
+            else
+            {
+                currentState = State.Idle; 
+            }
+            
         }
     }
 }
