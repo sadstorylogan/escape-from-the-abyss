@@ -5,8 +5,8 @@
 
 ## Visual Showcase
 
-![Gameplay Image] ("C:\Users\sezgi\OneDrive\Masaüstü\Screenshot 2023-10-27 164319.png")
-![Boss Fight Image] ("C:\Users\sezgi\OneDrive\Masaüstü\Screenshot 2023-10-27 170405.png")
+![Gameplay Image] (C:\Users\sezgi\OneDrive\Masaüstü\Screenshot 2023-10-27 164319.png)
+![Boss Fight Image] (C:\Users\sezgi\OneDrive\Masaüstü\Screenshot 2023-10-27 170405.png)
 
 ## Features
 - **Three Distinct Levels**: Each level offers a unique, immersive experience with its own set of challenges, from mind-bending puzzles to adrenaline-pumping combat scenarios.
