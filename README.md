@@ -4,9 +4,9 @@
 "Escape from the Abyss" is a showcase of game design skills, intricately crafted to provide a thrilling experience through puzzle-solving, strategic enemy encounters, and an epic boss fight. Set across three meticulously designed levels, each stage plunges players into immersive challenges that demand strategy, cunning, and dexterity.
 
 ## Visual Showcase
+![Gameplay Image](https://github.com/sadstorylogan/escape-from-the-abyss/assets/44436956/16162e56-abb2-4f64-98ac-797f6487c97a)
+![Boss Fight Image](https://github.com/sadstorylogan/escape-from-the-abyss/assets/44436956/106a2dfb-38a2-45d5-95ef-350a0f78ef34)
 
-![Gameplay Image] (C:\Users\sezgi\OneDrive\Masaüstü\Screenshot 2023-10-27 164319.png)
-![Boss Fight Image] (C:\Users\sezgi\OneDrive\Masaüstü\Screenshot 2023-10-27 170405.png)
 
 ## Features
 - **Three Distinct Levels**: Each level offers a unique, immersive experience with its own set of challenges, from mind-bending puzzles to adrenaline-pumping combat scenarios.
